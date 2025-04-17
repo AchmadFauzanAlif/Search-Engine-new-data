@@ -78,7 +78,6 @@ sorted_docs = sorted(result_docs.values(), key=lambda d: d['score'], reverse=Tru
 
 # Output hasil (maksimal top_n)
 for count, doc in enumerate(sorted_docs[:top_n], start=1):
-    print(f"Jumlah dokumen ditemukan: {len(result_docs)}", file=sys.stderr)
     print(json.dumps(doc, ensure_ascii=False))
 
 if not result_docs:
