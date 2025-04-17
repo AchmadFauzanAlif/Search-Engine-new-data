@@ -2,19 +2,27 @@ import re
 import sys
 import json
 import pickle
+import io
 
-# Argument check
-if len(sys.argv) != 4:
-    print("\nPenggunaan:\n\tpython query.py [index.pkl] [jumlah_hasil] [query string]\n")
+
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+if len(sys.argv) < 4 or len(sys.argv) > 5:
+    print("\nPenggunaan:\n\tpython query.py [index.pkl] [jumlah_hasil] [query] [tahun(optional)]\n")
     sys.exit(1)
+
 
 index_path = sys.argv[1]
 top_n = int(sys.argv[2])
+if top_n <= 0:
+    top_n = 9999
 query_input = sys.argv[3]
+year_filter = sys.argv[4] if len(sys.argv) == 5 else None
 
-# Stopwords opsional (gunakan kalau kamu punya file stopword.txt)
+
 try:
-    stopwords = open("stopword.txt", encoding="utf-8").read().split("\n")
+    stopwords = open("public/stopword.txt", encoding="utf-8").read().split("\n")
 except:
     stopwords = []
 
@@ -38,19 +46,32 @@ with open(index_path, 'rb') as indexdb:
 
 # Cari dokumen yang relevan
 result_docs = {}
-for word in query_words:
-    if word in stopwords or word == "":
-        continue
 
-    if word not in index:
-        continue
-
-    for doc in index[word]:
-        if doc['url'] in result_docs:
-            result_docs[doc['url']]['score'] += doc['score']
-        else:
-            # Buat salinan dict agar tidak refer ke object asli
+if not query_words:
+    seen_urls = set()
+    for word in index:
+        for doc in index[word]:
+            if year_filter and str(doc.get('tahun')) != str(year_filter):
+                continue
+            if doc['url'] in seen_urls:
+                continue
             result_docs[doc['url']] = doc.copy()
+            seen_urls.add(doc['url'])
+else:
+    # Query tidak kosong → cari berdasarkan keyword
+    for word in query_words:
+        if word in stopwords or word == "":
+            continue
+        if word not in index:
+            continue
+        for doc in index[word]:
+            if year_filter and str(doc.get('tahun')) != str(year_filter):
+                continue  
+            if doc['url'] in result_docs:
+                result_docs[doc['url']]['score'] += doc['score']
+            else:
+                result_docs[doc['url']] = doc.copy()
+
 
 # Konversi ke list dan sorting
 sorted_docs = sorted(result_docs.values(), key=lambda d: d['score'], reverse=True)

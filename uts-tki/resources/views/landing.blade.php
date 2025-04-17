@@ -16,8 +16,9 @@
             $("#search").click(function(){
                 var cari = $("#cari").val();
                 var rank = $("#rank").val();
+                var tahun = $("#tahun").val();
                 $.ajax({
-                    url:'/search?q='+cari+'&rank='+rank,
+                    url:'/search?q=' + encodeURIComponent(cari) + '&rank=' + rank + '&year=' + tahun,
                     dataType : "json",
                     success: function(data){
                         $('#content').html(data);
@@ -29,46 +30,6 @@
             });
         });
         </script>
-        
-    {{-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            background: linear-gradient(120deg, #71b280, #134e5e);
-            color: white;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            color: white;
-        }
-        .search-container {
-            padding: 50px 0;
-            text-align: center;
-            background: linear-gradient(120deg, #11998e, #38ef7d);
-            color: white;
-        }
-        .input-group {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        #content {
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .book-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin: 10px;
-            width: 300px;
-            text-align: center;
-        }
-    </style> --}}
 
 </head>
 <body>
@@ -80,21 +41,23 @@
     </nav>
 
     <!-- Form -->
-    <div class="container">
-        <form class="row g-3 justify-content-center mb-4" onsubmit="return false">
-            <div class="col-md-6">
-                <input type="text" id="cari" class="form-control" placeholder="Masukkan kata kunci">
-            </div>
-            <div class="col-auto">
-                <select id="rank" class="form-select">
-                    <option value="5">5 hasil</option>
-                    <option value="10">10 hasil</option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button id="search" class="btn btn-primary">Search</button>
-            </div>
-        </form>
+    <div class="container"> 
+        <form onsubmit="return false;">
+            <input type="text" id="cari" placeholder="Cari judul skripsi...">
+            <select id="rank">
+                <option value="">Semua Skripsi</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+            <select id="tahun" class="form-control mx-2">
+                <option value="">Semua Tahun</option>
+                @foreach ($tahunList as $tahun)
+                    <option value="{{ $tahun }}">{{ $tahun }}</option>
+                @endforeach
+            </select>            
+            <button id="search">Search</button>
+        </form>        
 
         <!-- Tempat Hasil Pencarian -->
         <div id="content" class="mt-4"></div>
