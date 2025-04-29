@@ -59,7 +59,7 @@ for data in content:
 
 	tf_data[data['url_detail']] = tf
 
-# Calculate Idf
+
 for x in df_data:
    idf_data[x] = 1 + math.log10(len(tf_data)/df_data[x])
 
@@ -91,6 +91,5 @@ for word in df_data:
 		
 	tf_idf[word] = list_doc
 
-# Write and save dictionary to file using pickle module
 with open(output_data, 'wb') as file:
     pickle.dump(tf_idf, file)

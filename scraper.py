@@ -51,7 +51,6 @@ class UnairScraper:
 
                 self.results.append(data)
 
-            # Cari link "Next"
             next_link = soup.find("a", string="Next")
             if next_link and 'href' in next_link.attrs:
                 page_url = self.base_url + next_link['href']
@@ -59,7 +58,7 @@ class UnairScraper:
             else:
                 break
 
-    def save(self, filename="hasil_unair.json"):
+    def save(self, filename="unair.json"):
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(self.results, f, ensure_ascii=False, indent=4)
         print(f"Disimpan ke {filename} - Total: {len(self.results)} data.")
